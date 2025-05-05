@@ -1,0 +1,266 @@
+[
+  {
+    "id": "3a2663a1-c6f4-493a-b9b9-2381a9a93048",
+    "title": "Cannot login to my account",
+    "description": "I forgot my password and can't login. How can I reset it?",
+    "customer_email": "john.smith@example.com",
+    "status": "resolved",
+    "created_at": "2025-05-05T02:00:02.398590",
+    "updated_at": "2025-05-05T02:00:10.570896",
+    "history": [
+      {
+        "timestamp": "2025-05-05T02:00:02.398590",
+        "action": "Ticket created",
+        "user": "john.smith@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:00:02.398590",
+        "action": "AI response provided",
+        "user": "AI System"
+      },
+      {
+        "timestamp": "2025-05-05T02:00:08.526361",
+        "action": "Assigned to onur.vizja@gmail.com",
+        "user": "admin@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:00:10.570896",
+        "action": "Ticket resolved: Provided instructions on how to reset password",
+        "user": "onur.vizja@gmail.com"
+      }
+    ],
+    "ai_response": "You can reset your password by clicking on 'Forgot Password' on the login screen.",
+    "assigned_to": "onur.vizja@gmail.com",
+    "resolution": "Provided instructions on how to reset password",
+    "resolved_at": "2025-05-05T02:00:10.570896"
+  },
+  {
+    "id": "f029193d-48a1-4729-aa0a-65803d3e6e31",
+    "title": "Application crashes when uploading large files",
+    "description": "When I try to upload files larger than 10MB, the application crashes and I get an error message. Can you help?",
+    "customer_email": "sarah.jones@example.com",
+    "status": "assigned",
+    "created_at": "2025-05-05T02:01:58.179867",
+    "updated_at": "2025-05-05T02:02:04.311220",
+    "history": [
+      {
+        "timestamp": "2025-05-05T02:01:58.179867",
+        "action": "Ticket created",
+        "user": "sarah.jones@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:02:04.311220",
+        "action": "Assigned to onur.vizja@gmail.com",
+        "user": "admin@example.com"
+      }
+    ],
+    "assigned_to": "onur.vizja@gmail.com"
+  },
+  {
+    "id": "db381265-3cea-4aa4-bc06-37588ec73002",
+    "title": "Billing issue with my subscription",
+    "description": "I was charged twice for my monthly subscription. Please help me resolve this and get a refund for the duplicate charge.",
+    "customer_email": "michael.brown@example.com",
+    "status": "new",
+    "created_at": "2025-05-05T02:03:45.190999",
+    "updated_at": "2025-05-05T02:03:45.190999",
+    "history": [
+      {
+        "timestamp": "2025-05-05T02:03:45.190999",
+        "action": "Ticket created",
+        "user": "michael.brown@example.com"
+      }
+    ]
+  },
+  {
+    "id": "52fae541-3c3f-4e3e-a00e-5586ff609e2c",
+    "title": "Feature request: Dark mode",
+    "description": "I would love to see a dark mode option in the application. It would be easier on the eyes when working late at night.",
+    "customer_email": "emma.wilson@example.com",
+    "status": "ai_responded",
+    "created_at": "2025-05-05T02:09:21.126757",
+    "updated_at": "2025-05-05T02:09:21.126757",
+    "history": [
+      {
+        "timestamp": "2025-05-05T02:09:21.126757",
+        "action": "Ticket created",
+        "user": "emma.wilson@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:09:21.126757",
+        "action": "AI response provided",
+        "user": "AI System"
+      }
+    ],
+    "ai_response": "Thank you for your feature request! We're currently collecting feedback on dark mode implementation. I've forwarded your request to our product team for consideration in our upcoming releases."
+  },
+  {
+    "id": "4e46002f-41f0-4dca-8340-15d24cce549b",
+    "title": "Integration with third-party service not working",
+    "description": "I'm trying to connect my account with Salesforce, but I keep getting an authentication error. I've verified my Salesforce credentials are correct.",
+    "customer_email": "david.garcia@example.com",
+    "status": "resolved",
+    "created_at": "2025-05-05T02:11:36.210568",
+    "updated_at": "2025-05-05T02:11:44.403225",
+    "history": [
+      {
+        "timestamp": "2025-05-05T02:11:36.211576",
+        "action": "Ticket created",
+        "user": "david.garcia@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:11:42.351372",
+        "action": "Assigned to onur.vizja@gmail.com",
+        "user": "admin@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:11:44.403225",
+        "action": "Ticket resolved: Fixed API connection issue with Salesforce",
+        "user": "onur.vizja@gmail.com"
+      }
+    ],
+    "assigned_to": "onur.vizja@gmail.com",
+    "resolution": "Fixed API connection issue with Salesforce. The problem was related to an expired API token that needed to be refreshed.",
+    "resolved_at": "2025-05-05T02:11:44.403225"
+  },
+  {
+    "id": "9c3c0d61-8ec9-4f62-b48a-d9e0c5ddb107",
+    "title": "Cannot login to my account",
+    "description": "I forgot my password and can't login. How can I reset it?",
+    "customer_email": "customer@example.com",
+    "status": "resolved",
+    "created_at": "2025-05-05T02:34:57.837510",
+    "updated_at": "2025-05-05T02:35:07.178398",
+    "history": [
+      {
+        "timestamp": "2025-05-05T02:34:57.837510",
+        "action": "Ticket created",
+        "user": "customer@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:34:57.837510",
+        "action": "AI response provided",
+        "user": "AI System"
+      },
+      {
+        "timestamp": "2025-05-05T02:35:04.760037",
+        "action": "Assigned to agent@example.com",
+        "user": "admin@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:35:07.178398",
+        "action": "Ticket resolved: Provided instructions on how to reset password",
+        "user": "agent@example.com"
+      }
+    ],
+    "ai_response": "You can reset your password by clicking on 'Forgot Password' on the login screen.",
+    "assigned_to": "agent@example.com",
+    "resolution": "Provided instructions on how to reset password",
+    "resolved_at": "2025-05-05T02:35:07.178398"
+  },
+  {
+    "id": "61420dde-9e4d-4631-a627-a0901d3fb1b4",
+    "title": "Cannot login to my account",
+    "description": "I forgot my password and can't login. How can I reset it?",
+    "customer_email": "customer@example.com",
+    "status": "resolved",
+    "created_at": "2025-05-05T02:37:55.375270",
+    "updated_at": "2025-05-05T02:38:09.541231",
+    "history": [
+      {
+        "timestamp": "2025-05-05T02:37:55.375270",
+        "action": "Ticket created",
+        "user": "customer@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:37:55.375270",
+        "action": "AI response provided",
+        "user": "AI System"
+      },
+      {
+        "timestamp": "2025-05-05T02:38:06.222148",
+        "action": "Assigned to agent@example.com",
+        "user": "admin@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:38:09.541231",
+        "action": "Ticket resolved: Provided instructions on how to reset password",
+        "user": "agent@example.com"
+      }
+    ],
+    "ai_response": "You can reset your password by clicking on 'Forgot Password' on the login screen.",
+    "assigned_to": "agent@example.com",
+    "resolution": "Provided instructions on how to reset password",
+    "resolved_at": "2025-05-05T02:38:09.541231"
+  },
+  {
+    "id": "9c43c5e8-e596-4075-9e05-5cfef652ce7e",
+    "title": "Cannot login to my account",
+    "description": "I forgot my password and can't login. How can I reset it?",
+    "customer_email": "customer@example.com",
+    "status": "resolved",
+    "created_at": "2025-05-05T02:47:00.187739",
+    "updated_at": "2025-05-05T02:47:15.275058",
+    "history": [
+      {
+        "timestamp": "2025-05-05T02:47:00.187739",
+        "action": "Ticket created",
+        "user": "customer@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:47:00.187739",
+        "action": "AI response provided",
+        "user": "AI System"
+      },
+      {
+        "timestamp": "2025-05-05T02:47:10.899205",
+        "action": "Assigned to agent@example.com",
+        "user": "admin@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:47:15.275058",
+        "action": "Ticket resolved: Provided instructions on how to reset password",
+        "user": "agent@example.com"
+      }
+    ],
+    "ai_response": "You can reset your password by clicking on 'Forgot Password' on the login screen.",
+    "assigned_to": "agent@example.com",
+    "resolution": "Provided instructions on how to reset password",
+    "resolved_at": "2025-05-05T02:47:15.275058"
+  },
+  {
+    "id": "2d147b08-6dde-4f6f-a7e5-e4c6060b6af2",
+    "title": "Cannot login to my account",
+    "description": "I forgot my password and can't login. How can I reset it?",
+    "customer_email": "customer@example.com",
+    "status": "resolved",
+    "created_at": "2025-05-05T02:47:37.217322",
+    "updated_at": "2025-05-05T02:47:49.298150",
+    "history": [
+      {
+        "timestamp": "2025-05-05T02:47:37.217322",
+        "action": "Ticket created",
+        "user": "customer@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:47:37.217322",
+        "action": "AI response provided",
+        "user": "AI System"
+      },
+      {
+        "timestamp": "2025-05-05T02:47:45.952398",
+        "action": "Assigned to agent@example.com",
+        "user": "admin@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T02:47:49.298150",
+        "action": "Ticket resolved: Provided instructions on how to reset password",
+        "user": "agent@example.com"
+      }
+    ],
+    "ai_response": "You can reset your password by clicking on 'Forgot Password' on the login screen.",
+    "assigned_to": "agent@example.com",
+    "resolution": "Provided instructions on how to reset password",
+    "resolved_at": "2025-05-05T02:47:49.298150"
+  }
+]
