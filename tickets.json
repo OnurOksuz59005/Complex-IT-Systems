@@ -262,5 +262,40 @@
     "assigned_to": "agent@example.com",
     "resolution": "Provided instructions on how to reset password",
     "resolved_at": "2025-05-05T02:47:49.298150"
+  },
+  {
+    "id": "ad6aaafa-0100-4abb-8b6d-a768b0e1b6be",
+    "title": "Cannot login to my account",
+    "description": "I forgot my password and can't login. How can I reset it?",
+    "customer_email": "customer@example.com",
+    "status": "resolved",
+    "created_at": "2025-05-05T11:26:49.611682",
+    "updated_at": "2025-05-05T11:27:03.255039",
+    "history": [
+      {
+        "timestamp": "2025-05-05T11:26:49.611682",
+        "action": "Ticket created",
+        "user": "customer@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T11:26:49.611682",
+        "action": "AI response provided",
+        "user": "AI System"
+      },
+      {
+        "timestamp": "2025-05-05T11:26:59.799528",
+        "action": "Assigned to agent@example.com",
+        "user": "admin@example.com"
+      },
+      {
+        "timestamp": "2025-05-05T11:27:03.255039",
+        "action": "Ticket resolved: Provided instructions on how to reset password",
+        "user": "agent@example.com"
+      }
+    ],
+    "ai_response": "You can reset your password by clicking on 'Forgot Password' on the login screen.",
+    "assigned_to": "agent@example.com",
+    "resolution": "Provided instructions on how to reset password",
+    "resolved_at": "2025-05-05T11:27:03.255039"
   }
 ]

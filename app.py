@@ -336,19 +336,56 @@ Support System"""
 
 # Mock AI response function (in a real app, this would call the ChatGPT API)
 def get_ai_response(question):
-    # This is a placeholder for the ChatGPT API integration
-    common_responses = {
-        "password": "You can reset your password by clicking on 'Forgot Password' on the login screen.",
-        "login": "If you're having trouble logging in, please make sure your caps lock is off and try again.",
-        "account": "To create a new account, click on 'Sign Up' on our homepage.",
-        "hours": "Our support hours are Monday-Friday, 9am-5pm EST."
-    }
-    
-    for keyword, response in common_responses.items():
-        if keyword in question.lower():
-            return response
-    
-    return None  # No automated response available
+    """Get response from OpenAI's ChatGPT API"""
+    try:
+        import openai
+        
+        # Set your OpenAI API key here or use environment variable
+        # openai.api_key = os.environ.get("OPENAI_API_KEY")
+        # For demonstration, we'll use a placeholder - you'll need to replace with your actual API key
+        openai_api_key = os.environ.get("OPENAI_API_KEY", "your_api_key_here")
+        
+        if openai_api_key == "your_api_key_here":
+            logger.warning("Using mock AI response as no valid API key was provided")
+            # Fall back to mock responses if no API key
+            common_responses = {
+                "password": "You can reset your password by clicking on 'Forgot Password' on the login screen.",
+                "login": "If you're having trouble logging in, please make sure your caps lock is off and try again.",
+                "account": "To create a new account, click on 'Sign Up' on our homepage.",
+                "hours": "Our support hours are Monday-Friday, 9am-5pm EST."
+            }
+            
+            for keyword, response in common_responses.items():
+                if keyword in question.lower():
+                    return response
+            
+            return "I'm sorry, I don't have an automated answer for this question. A support agent will assist you shortly."
+        
+        # Initialize the OpenAI client
+        client = openai.OpenAI(api_key=openai_api_key)
+        
+        # Create a system message to set the context
+        system_message = "You are a helpful customer support assistant. Provide concise, accurate answers to customer questions."
+        
+        # Call the OpenAI API
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": question}
+            ],
+            max_tokens=150,
+            temperature=0.7
+        )
+        
+        # Extract and return the AI's response
+        ai_response = response.choices[0].message.content.strip()
+        logger.info(f"AI response generated for question: {question[:50]}...")
+        return ai_response
+        
+    except Exception as e:
+        logger.error(f"Error getting AI response: {e}")
+        return "I'm sorry, I encountered an error processing your question. A support agent will assist you shortly."
 
 @app.route('/api/tickets', methods=['GET'])
 def get_tickets():
@@ -559,4 +596,5 @@ def get_stats():
 load_tickets()
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
