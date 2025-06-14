@@ -569,6 +569,39 @@ def resolve_ticket(ticket_id):
     
     return jsonify({"error": "Ticket not found"}), 404
 
+@app.route('/api/tickets/<ticket_id>/ai_response', methods=['GET'])
+def get_ticket_ai_response(ticket_id):
+    """Get or generate AI response for a specific ticket"""
+    for ticket in tickets:
+        if ticket['id'] == ticket_id:
+            # If ticket already has an AI response, return it
+            if 'ai_response' in ticket:
+                return jsonify({"ai_response": ticket['ai_response']})
+            
+            # Otherwise, generate a new response
+            ai_response = get_ai_response(ticket['description'])
+            if ai_response:
+                ticket['ai_response'] = ai_response
+                ticket['status'] = STATUS_AI_RESPONDED
+                ticket['history'].append({
+                    'timestamp': datetime.now().isoformat(),
+                    'action': 'AI response provided',
+                    'user': 'AI System'
+                })
+                save_tickets()
+                
+                # Send email notification about AI response
+                try:
+                    notify_ai_response(ticket)
+                except Exception as e:
+                    logger.error(f"Error sending AI response notification: {e}")
+                
+                return jsonify({"ai_response": ai_response})
+            else:
+                return jsonify({"error": "Failed to generate AI response"}), 500
+    
+    return jsonify({"error": "Ticket not found"}), 404
+
 @app.route('/api/stats', methods=['GET'])
 def get_stats():
     """Get ticket statistics for admin dashboard"""
