@@ -336,9 +336,10 @@ Support System"""
 
 # Mock AI response function (in a real app, this would call the ChatGPT API)
 def get_ai_response(question):
-    """Get response from OpenAI's ChatGPT API"""
+    """Get response from OpenAI's ChatGPT API using direct HTTP request"""
     try:
-        import openai
+        import requests
+        import json
         
         # Get OpenAI API key from environment variable
         openai_api_key = os.environ.get("OPENAI_API_KEY")
@@ -366,35 +367,45 @@ def get_ai_response(question):
             
             return "I'm sorry, I don't have an automated answer for this question. A support agent will assist you shortly."
         
-        # Initialize the OpenAI client with the new v1.0+ API format
-        logger.info("Initializing OpenAI client and making API call...")
+        # Make a direct HTTP request to the OpenAI API
+        logger.info("Making direct HTTP request to OpenAI API...")
         try:
-            # Create OpenAI client with the new v1.0+ API format
-            client = openai.OpenAI(api_key=openai_api_key)
+            # API endpoint
+            url = "https://api.openai.com/v1/chat/completions"
             
-            # Create a system message to set the context
-            system_message = "You are a helpful customer support assistant. Provide concise, accurate answers to customer questions."
+            # Headers
+            headers = {
+                "Authorization": f"Bearer {openai_api_key}",
+                "Content-Type": "application/json"
+            }
             
-            # Call the OpenAI API using the new v1.0+ format
-            logger.info(f"Sending request to OpenAI API with question: {question[:50]}...")
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": system_message},
+            # Request body
+            data = {
+                "model": "gpt-3.5-turbo",
+                "messages": [
+                    {"role": "system", "content": "You are a helpful customer support assistant. Provide concise, accurate answers to customer questions."},
                     {"role": "user", "content": question}
                 ],
-                max_tokens=150,
-                temperature=0.7
-            )
+                "max_tokens": 150,
+                "temperature": 0.7
+            }
+            
+            # Make the request
+            logger.info(f"Sending request to OpenAI API with question: {question[:50]}...")
+            response = requests.post(url, headers=headers, json=data, timeout=30)
+            response.raise_for_status()  # Raise exception for HTTP errors
+            
+            # Parse the response
+            response_data = response.json()
             logger.info("OpenAI API call successful")
+            
+            # Extract the AI's response
+            ai_response = response_data["choices"][0]["message"]["content"].strip()
+            logger.info(f"AI response generated for question: {question[:50]}...")
+            return ai_response
         except Exception as e:
-            logger.error(f"Error during OpenAI API call: {str(e)}")
-            return "I'm sorry, I encountered an error processing your question. A support agent will assist you shortly. Error: API call failed."
-        
-        # Extract and return the AI's response using the new API format
-        ai_response = response.choices[0].message.content.strip()
-        logger.info(f"AI response generated for question: {question[:50]}...")
-        return ai_response
+            logger.error(f"Error during OpenAI API HTTP request: {str(e)}")
+            return "I'm sorry, I encountered an error processing your question. A support agent will assist you shortly. Error: API request failed."
         
     except Exception as e:
         logger.error(f"Error getting AI response: {e}")
