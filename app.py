@@ -343,10 +343,11 @@ def get_ai_response(question):
         # Get OpenAI API key from environment variable
         openai_api_key = os.environ.get("OPENAI_API_KEY")
         
-        # For local testing, you can uncomment and use this line instead
-        # But NEVER commit API keys to version control
-        # if not openai_api_key:
-        #     openai_api_key = "your-api-key-here"  # Replace with your key for local testing only
+        # Debug logging
+        if openai_api_key:
+            logger.info(f"OpenAI API key found. Length: {len(openai_api_key)}, First 5 chars: {openai_api_key[:5]}")
+        else:
+            logger.warning("OpenAI API key not found in environment variables")
         
         # Check if API key is missing or incomplete
         if not openai_api_key or len(openai_api_key) < 20:
@@ -366,21 +367,28 @@ def get_ai_response(question):
             return "I'm sorry, I don't have an automated answer for this question. A support agent will assist you shortly."
         
         # Initialize the OpenAI client
-        client = openai.OpenAI(api_key=openai_api_key)
-        
-        # Create a system message to set the context
-        system_message = "You are a helpful customer support assistant. Provide concise, accurate answers to customer questions."
-        
-        # Call the OpenAI API
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": question}
-            ],
-            max_tokens=150,
-            temperature=0.7
-        )
+        logger.info("Initializing OpenAI client and making API call...")
+        try:
+            client = openai.OpenAI(api_key=openai_api_key)
+            
+            # Create a system message to set the context
+            system_message = "You are a helpful customer support assistant. Provide concise, accurate answers to customer questions."
+            
+            # Call the OpenAI API
+            logger.info(f"Sending request to OpenAI API with question: {question[:50]}...")
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": question}
+                ],
+                max_tokens=150,
+                temperature=0.7
+            )
+            logger.info("OpenAI API call successful")
+        except Exception as e:
+            logger.error(f"Error during OpenAI API call: {str(e)}")
+            return "I'm sorry, I encountered an error processing your question. A support agent will assist you shortly. Error: API call failed."
         
         # Extract and return the AI's response
         ai_response = response.choices[0].message.content.strip()
