@@ -403,6 +403,13 @@ def get_ai_response(question):
             ai_response = response_data["choices"][0]["message"]["content"].strip()
             logger.info(f"AI response generated for question: {question[:50]}...")
             return ai_response
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 429:
+                logger.error("OpenAI API rate limit exceeded. You need to set up billing in your OpenAI account.")
+                return "I'm sorry, the AI service is currently unavailable due to rate limiting. Please set up billing in your OpenAI account or try again later."
+            else:
+                logger.error(f"HTTP error during OpenAI API request: {e.response.status_code} - {str(e)}")
+                return f"I'm sorry, I encountered an error processing your question. A support agent will assist you shortly. Error: {e.response.status_code}"
         except Exception as e:
             logger.error(f"Error during OpenAI API HTTP request: {str(e)}")
             return "I'm sorry, I encountered an error processing your question. A support agent will assist you shortly. Error: API request failed."
