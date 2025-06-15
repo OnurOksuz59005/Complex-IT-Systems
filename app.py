@@ -340,12 +340,16 @@ def get_ai_response(question):
     try:
         import openai
         
-        # Set your OpenAI API key here or use environment variable
-        # openai.api_key = os.environ.get("OPENAI_API_KEY")
-        # For demonstration, we'll use a placeholder - you'll need to replace with your actual API key
-        openai_api_key = os.environ.get("OPENAI_API_KEY", "sk-...kB8A")
+        # Get OpenAI API key from environment variable
+        openai_api_key = os.environ.get("OPENAI_API_KEY")
         
-        if openai_api_key == "your_api_key_here":
+        # For local testing, you can uncomment and use this line instead
+        # But NEVER commit API keys to version control
+        # if not openai_api_key:
+        #     openai_api_key = "your-api-key-here"  # Replace with your key for local testing only
+        
+        # Check if API key is missing or incomplete
+        if not openai_api_key or len(openai_api_key) < 20:
             logger.warning("Using mock AI response as no valid API key was provided")
             # Fall back to mock responses if no API key
             common_responses = {
