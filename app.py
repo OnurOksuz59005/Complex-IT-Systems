@@ -366,18 +366,18 @@ def get_ai_response(question):
             
             return "I'm sorry, I don't have an automated answer for this question. A support agent will assist you shortly."
         
-        # Initialize the OpenAI client - handling both new and old API versions
+        # Initialize the OpenAI client with the new v1.0+ API format
         logger.info("Initializing OpenAI client and making API call...")
         try:
-            # Set the API key for the OpenAI library
-            openai.api_key = openai_api_key
+            # Create OpenAI client with the new v1.0+ API format
+            client = openai.OpenAI(api_key=openai_api_key)
             
             # Create a system message to set the context
             system_message = "You are a helpful customer support assistant. Provide concise, accurate answers to customer questions."
             
-            # Call the OpenAI API using the older style that works with various versions
+            # Call the OpenAI API using the new v1.0+ format
             logger.info(f"Sending request to OpenAI API with question: {question[:50]}...")
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": system_message},
@@ -391,8 +391,8 @@ def get_ai_response(question):
             logger.error(f"Error during OpenAI API call: {str(e)}")
             return "I'm sorry, I encountered an error processing your question. A support agent will assist you shortly. Error: API call failed."
         
-        # Extract and return the AI's response - compatible with older API format
-        ai_response = response.choices[0].message.content.strip() if hasattr(response.choices[0], 'message') else response.choices[0].text.strip()
+        # Extract and return the AI's response using the new API format
+        ai_response = response.choices[0].message.content.strip()
         logger.info(f"AI response generated for question: {question[:50]}...")
         return ai_response
         
