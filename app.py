@@ -343,7 +343,7 @@ def get_ai_response(question):
         # Set your OpenAI API key here or use environment variable
         # openai.api_key = os.environ.get("OPENAI_API_KEY")
         # For demonstration, we'll use a placeholder - you'll need to replace with your actual API key
-        openai_api_key = os.environ.get("OPENAI_API_KEY", "your_api_key_here")
+        openai_api_key = os.environ.get("OPENAI_API_KEY", "sk-...kB8A")
         
         if openai_api_key == "your_api_key_here":
             logger.warning("Using mock AI response as no valid API key was provided")
