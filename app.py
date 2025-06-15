@@ -366,17 +366,18 @@ def get_ai_response(question):
             
             return "I'm sorry, I don't have an automated answer for this question. A support agent will assist you shortly."
         
-        # Initialize the OpenAI client
+        # Initialize the OpenAI client - handling both new and old API versions
         logger.info("Initializing OpenAI client and making API call...")
         try:
-            client = openai.OpenAI(api_key=openai_api_key)
+            # Set the API key for the OpenAI library
+            openai.api_key = openai_api_key
             
             # Create a system message to set the context
             system_message = "You are a helpful customer support assistant. Provide concise, accurate answers to customer questions."
             
-            # Call the OpenAI API
+            # Call the OpenAI API using the older style that works with various versions
             logger.info(f"Sending request to OpenAI API with question: {question[:50]}...")
-            response = client.chat.completions.create(
+            response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": system_message},
@@ -390,8 +391,8 @@ def get_ai_response(question):
             logger.error(f"Error during OpenAI API call: {str(e)}")
             return "I'm sorry, I encountered an error processing your question. A support agent will assist you shortly. Error: API call failed."
         
-        # Extract and return the AI's response
-        ai_response = response.choices[0].message.content.strip()
+        # Extract and return the AI's response - compatible with older API format
+        ai_response = response.choices[0].message.content.strip() if hasattr(response.choices[0], 'message') else response.choices[0].text.strip()
         logger.info(f"AI response generated for question: {question[:50]}...")
         return ai_response
         
