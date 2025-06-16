@@ -23,7 +23,7 @@ def test_create_ticket():
     }
     response = requests.post(f"{BASE_URL}/tickets", json=data)
     print_response(response)
-    return response.json()["id"]
+    return response.json()["data"]["id"]
 
 def test_get_tickets():
     """Test getting all tickets"""

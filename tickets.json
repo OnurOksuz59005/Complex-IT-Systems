@@ -297,5 +297,40 @@
     "assigned_to": "agent@example.com",
     "resolution": "Provided instructions on how to reset password",
     "resolved_at": "2025-05-05T11:27:03.255039"
+  },
+  {
+    "id": "4043ae07-13af-42a5-8bfa-18f5ff9b8f83",
+    "title": "Cannot login to my account",
+    "description": "I forgot my password and can't login. How can I reset it?",
+    "customer_email": "customer@example.com",
+    "status": "ai_responded",
+    "created_at": "2025-06-16T03:24:50.949048",
+    "updated_at": "2025-06-16T03:24:53.059482",
+    "ai_response": "You can reset your password by clicking on 'Forgot Password' on the login screen."
+  },
+  {
+    "id": "52ce507f-152d-4b81-aa38-71f5e4daaab9",
+    "title": "Cannot login to my account",
+    "description": "I forgot my password and can't login. How can I reset it?",
+    "customer_email": "customer@example.com",
+    "status": "resolved",
+    "created_at": "2025-06-16T03:25:19.416903",
+    "updated_at": "2025-06-16T03:25:33.364600",
+    "ai_response": "You can reset your password by clicking on 'Forgot Password' on the login screen.",
+    "assigned_to": "agent@example.com",
+    "history": [
+      {
+        "timestamp": "2025-06-16T03:25:28.750661",
+        "action": "Assigned to agent@example.com",
+        "user": "admin@example.com"
+      },
+      {
+        "timestamp": "2025-06-16T03:25:33.364600",
+        "action": "Ticket resolved: Provided instructions on how to reset password",
+        "user": "agent@example.com"
+      }
+    ],
+    "resolution": "Provided instructions on how to reset password",
+    "resolved_at": "2025-06-16T03:25:33.364600"
   }
 ]
