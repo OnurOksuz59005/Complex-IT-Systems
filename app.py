@@ -8,7 +8,26 @@ import uuid
 import logging
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for integration with PowerApps
+# Enable CORS with specific settings for PowerApps integration
+CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE"], "allow_headers": "*"}})
+
+# Add response headers for PowerApps compatibility
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    return response
+
+# Helper function to create standardized API responses for PowerApps
+def api_response(data=None, message="Success", success=True, status_code=200):
+    """Create a standardized API response format for PowerApps"""
+    response = {
+        "success": success,
+        "message": message,
+        "data": data
+    }
+    return jsonify(response), status_code
 
 # Configure Flask-Mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -421,244 +440,324 @@ def get_ai_response(question):
 @app.route('/api/tickets', methods=['GET'])
 def get_tickets():
     """Get all tickets or filter by user/status"""
-    user_email = request.args.get('user')
-    status = request.args.get('status')
-    role = request.args.get('role')
-    
-    result = tickets
-    
-    # Filter by user if specified
-    if user_email:
-        if role == ROLE_CUSTOMER:
-            result = [t for t in result if t['customer_email'] == user_email]
-        elif role == ROLE_AGENT:
-            result = [t for t in result if t.get('assigned_to') == user_email]
-    
-    # Filter by status if specified
-    if status:
-        result = [t for t in result if t['status'] == status]
-    
-    return jsonify(result)
+    try:
+        user_email = request.args.get('user')
+        status = request.args.get('status')
+        role = request.args.get('role')
+        
+        result = tickets
+        
+        # Filter by user if specified
+        if user_email:
+            if role == ROLE_CUSTOMER:
+                result = [t for t in result if t['customer_email'] == user_email]
+            elif role == ROLE_AGENT:
+                result = [t for t in result if t.get('assigned_to') == user_email]
+        
+        # Filter by status if specified
+        if status:
+            result = [t for t in result if t['status'] == status]
+        
+        return api_response(data=result, message="Tickets retrieved successfully")
+    except Exception as e:
+        logger.error(f"Error retrieving tickets: {e}")
+        return api_response(data=None, message=f"Error retrieving tickets: {str(e)}", success=False, status_code=500)
 
 @app.route('/api/tickets/<ticket_id>', methods=['GET'])
 def get_ticket(ticket_id):
     """Get a specific ticket by ID"""
-    for ticket in tickets:
-        if ticket['id'] == ticket_id:
-            return jsonify(ticket)
-    
-    return jsonify({"error": "Ticket not found"}), 404
+    try:
+        for ticket in tickets:
+            if ticket['id'] == ticket_id:
+                return api_response(data=ticket, message="Ticket retrieved successfully")
+        
+        return api_response(data=None, message="Ticket not found", success=False, status_code=404)
+    except Exception as e:
+        logger.error(f"Error retrieving ticket {ticket_id}: {e}")
+        return api_response(data=None, message=f"Error retrieving ticket: {str(e)}", success=False, status_code=500)
 
 @app.route('/api/tickets', methods=['POST'])
 def create_ticket():
     """Create a new support ticket"""
-    data = request.json
-    
-    # Validate required fields
-    required_fields = ['title', 'description', 'customer_email']
-    for field in required_fields:
-        if field not in data:
-            return jsonify({"error": f"Missing required field: {field}"}), 400
-    
-    # Create new ticket
-    ticket_id = str(uuid.uuid4())
-    new_ticket = {
-        'id': ticket_id,
-        'title': data['title'],
-        'description': data['description'],
-        'customer_email': data['customer_email'],
-        'status': STATUS_NEW,
-        'created_at': datetime.now().isoformat(),
-        'updated_at': datetime.now().isoformat(),
-        'history': [
-            {
-                'timestamp': datetime.now().isoformat(),
-                'action': 'Ticket created',
-                'user': data['customer_email']
-            }
-        ]
-    }
-    
-    # Try to get an AI response
-    ai_response = get_ai_response(data['description'])
-    if ai_response:
-        new_ticket['ai_response'] = ai_response
-        new_ticket['status'] = STATUS_AI_RESPONDED
-        new_ticket['history'].append({
-            'timestamp': datetime.now().isoformat(),
-            'action': 'AI response provided',
-            'user': 'AI System'
-        })
-    
-    tickets.append(new_ticket)
-    save_tickets()
-    
-    # Send email notifications
     try:
-        # Notify customer about ticket creation
-        notify_ticket_created(new_ticket)
+        data = request.json
         
-        # If AI responded, send that notification too
-        if ai_response:
-            notify_ai_response(new_ticket)
+        # Validate required fields
+        if not data or not all(k in data for k in ['title', 'description', 'customer_email']):
+            return api_response(data=None, message="Missing required fields", success=False, status_code=400)
+        
+        # Create new ticket
+        ticket = {
+            'id': str(uuid.uuid4()),
+            'title': data['title'],
+            'description': data['description'],
+            'customer_email': data['customer_email'],
+            'status': STATUS_NEW,
+            'created_at': datetime.now().isoformat(),
+            'updated_at': datetime.now().isoformat()
+        }
+        
+        # Add ticket to database
+        tickets.append(ticket)
+        save_tickets()
+        
+        # Send notification email to customer
+        notify_ticket_created(ticket)
+        
+        # Generate AI response
+        try:
+            ai_response = get_ai_response(data['description'])
+            
+            # Update ticket with AI response
+            for t in tickets:
+                if t['id'] == ticket['id']:
+                    t['ai_response'] = ai_response
+                    t['status'] = STATUS_AI_RESPONDED
+                    t['updated_at'] = datetime.now().isoformat()
+                    
+                    # Send notification about AI response
+                    notify_ai_response(t)
+                    break
+                    
+            save_tickets()
+        except Exception as e:
+            logger.error(f"Error generating AI response: {e}")
+        
+        return api_response(data=ticket, message="Ticket created successfully", status_code=201)
     except Exception as e:
-        logger.error(f"Error sending email notifications: {e}")
-    
-    return jsonify(new_ticket), 201
+        logger.error(f"Error creating ticket: {e}")
+        return api_response(data=None, message=f"Error creating ticket: {str(e)}", success=False, status_code=500)
 
 @app.route('/api/tickets/<ticket_id>', methods=['PUT'])
 def update_ticket(ticket_id):
     """Update an existing ticket"""
-    data = request.json
-    
-    for i, ticket in enumerate(tickets):
-        if ticket['id'] == ticket_id:
-            # Update allowed fields
-            allowed_fields = ['status', 'assigned_to', 'resolution']
-            for field in allowed_fields:
-                if field in data:
-                    ticket[field] = data[field]
-            
-            # Add history entry
-            action = data.get('action', 'Ticket updated')
-            user = data.get('user', 'System')
-            ticket['history'].append({
-                'timestamp': datetime.now().isoformat(),
-                'action': action,
-                'user': user
-            })
-            
-            ticket['updated_at'] = datetime.now().isoformat()
-            tickets[i] = ticket
-            save_tickets()
-            return jsonify(ticket)
-    
-    return jsonify({"error": "Ticket not found"}), 404
+    try:
+        data = request.json
+        
+        for i, ticket in enumerate(tickets):
+            if ticket['id'] == ticket_id:
+                # Update allowed fields
+                allowed_fields = ['status', 'assigned_to', 'resolution']
+                for field in allowed_fields:
+                    if field in data:
+                        ticket[field] = data[field]
+                
+                # Add history entry if ticket has history field
+                if 'history' in ticket:
+                    action = data.get('action', 'Ticket updated')
+                    user = data.get('user', 'System')
+                    ticket['history'].append({
+                        'timestamp': datetime.now().isoformat(),
+                        'action': action,
+                        'user': user
+                    })
+                else:
+                    # Create history field if it doesn't exist
+                    ticket['history'] = [{
+                        'timestamp': datetime.now().isoformat(),
+                        'action': 'Ticket updated',
+                        'user': data.get('user', 'System')
+                    }]
+                
+                ticket['updated_at'] = datetime.now().isoformat()
+                tickets[i] = ticket
+                save_tickets()
+                return api_response(data=ticket, message="Ticket updated successfully")
+        
+        return api_response(data=None, message="Ticket not found", success=False, status_code=404)
+    except Exception as e:
+        logger.error(f"Error updating ticket {ticket_id}: {e}")
+        return api_response(data=None, message=f"Error updating ticket: {str(e)}", success=False, status_code=500)
 
 @app.route('/api/tickets/<ticket_id>/assign', methods=['POST'])
 def assign_ticket(ticket_id):
     """Assign a ticket to an agent"""
-    data = request.json
-    
-    if 'agent_email' not in data:
-        return jsonify({"error": "Missing required field: agent_email"}), 400
-    
-    for i, ticket in enumerate(tickets):
-        if ticket['id'] == ticket_id:
-            ticket['assigned_to'] = data['agent_email']
-            ticket['status'] = STATUS_ASSIGNED
-            ticket['updated_at'] = datetime.now().isoformat()
-            ticket['history'].append({
-                'timestamp': datetime.now().isoformat(),
-                'action': f"Assigned to {data['agent_email']}",
-                'user': data.get('user', 'System')
-            })
-            
-            tickets[i] = ticket
-            save_tickets()
-            
-            # Send email notification to the assigned agent
-            try:
-                notify_agent_assignment(ticket)
-            except Exception as e:
-                logger.error(f"Error sending assignment notification: {e}")
+    try:
+        data = request.json
+        
+        if 'agent_email' not in data:
+            return api_response(data=None, message="Missing required field: agent_email", success=False, status_code=400)
+        
+        for i, ticket in enumerate(tickets):
+            if ticket['id'] == ticket_id:
+                ticket['assigned_to'] = data['agent_email']
+                ticket['status'] = STATUS_ASSIGNED
+                ticket['updated_at'] = datetime.now().isoformat()
                 
-            return jsonify(ticket)
-    
-    return jsonify({"error": "Ticket not found"}), 404
+                # Add history entry if ticket has history field
+                if 'history' in ticket:
+                    ticket['history'].append({
+                        'timestamp': datetime.now().isoformat(),
+                        'action': f"Assigned to {data['agent_email']}",
+                        'user': data.get('user', 'System')
+                    })
+                else:
+                    # Create history field if it doesn't exist
+                    ticket['history'] = [{
+                        'timestamp': datetime.now().isoformat(),
+                        'action': f"Assigned to {data['agent_email']}",
+                        'user': data.get('user', 'System')
+                    }]
+                
+                tickets[i] = ticket
+                save_tickets()
+                
+                # Send email notification to the assigned agent
+                try:
+                    notify_agent_assignment(ticket)
+                except Exception as e:
+                    logger.error(f"Error sending assignment notification: {e}")
+                    
+                return api_response(data=ticket, message="Ticket assigned successfully")
+        
+        return api_response(data=None, message="Ticket not found", success=False, status_code=404)
+    except Exception as e:
+        logger.error(f"Error assigning ticket {ticket_id}: {e}")
+        return api_response(data=None, message=f"Error assigning ticket: {str(e)}", success=False, status_code=500)
 
 @app.route('/api/tickets/<ticket_id>/resolve', methods=['POST'])
 def resolve_ticket(ticket_id):
     """Resolve a ticket"""
-    data = request.json
-    
-    if 'resolution' not in data:
-        return jsonify({"error": "Missing required field: resolution"}), 400
-    
-    for i, ticket in enumerate(tickets):
-        if ticket['id'] == ticket_id:
-            ticket['resolution'] = data['resolution']
-            ticket['status'] = STATUS_RESOLVED
-            ticket['resolved_at'] = datetime.now().isoformat()
-            ticket['updated_at'] = datetime.now().isoformat()
-            ticket['history'].append({
-                'timestamp': datetime.now().isoformat(),
-                'action': f"Ticket resolved: {data['resolution']}",
-                'user': data.get('user', 'System')
-            })
-            
-            tickets[i] = ticket
-            save_tickets()
-            
-            # Send email notification to the customer about resolution
-            try:
-                notify_ticket_resolved(ticket)
-            except Exception as e:
-                logger.error(f"Error sending resolution notification: {e}")
+    try:
+        data = request.json
+        
+        if 'resolution' not in data:
+            return api_response(data=None, message="Missing required field: resolution", success=False, status_code=400)
+        
+        for i, ticket in enumerate(tickets):
+            if ticket['id'] == ticket_id:
+                ticket['resolution'] = data['resolution']
+                ticket['status'] = STATUS_RESOLVED
+                ticket['resolved_at'] = datetime.now().isoformat()
+                ticket['updated_at'] = datetime.now().isoformat()
                 
-            return jsonify(ticket)
-    
-    return jsonify({"error": "Ticket not found"}), 404
+                # Add history entry if ticket has history field
+                if 'history' in ticket:
+                    ticket['history'].append({
+                        'timestamp': datetime.now().isoformat(),
+                        'action': f"Ticket resolved: {data['resolution']}",
+                        'user': data.get('user', 'System')
+                    })
+                else:
+                    # Create history field if it doesn't exist
+                    ticket['history'] = [{
+                        'timestamp': datetime.now().isoformat(),
+                        'action': f"Ticket resolved: {data['resolution']}",
+                        'user': data.get('user', 'System')
+                    }]
+                
+                tickets[i] = ticket
+                save_tickets()
+                
+                # Send email notification to the customer about resolution
+                try:
+                    notify_ticket_resolved(ticket)
+                except Exception as e:
+                    logger.error(f"Error sending resolution notification: {e}")
+                    
+                return api_response(data=ticket, message="Ticket resolved successfully")
+        
+        return api_response(data=None, message="Ticket not found", success=False, status_code=404)
+    except Exception as e:
+        logger.error(f"Error resolving ticket {ticket_id}: {e}")
+        return api_response(data=None, message=f"Error resolving ticket: {str(e)}", success=False, status_code=500)
 
 @app.route('/api/tickets/<ticket_id>/ai_response', methods=['GET'])
 def get_ticket_ai_response(ticket_id):
     """Get or generate AI response for a specific ticket"""
-    for ticket in tickets:
-        if ticket['id'] == ticket_id:
-            # If ticket already has an AI response, return it
-            if 'ai_response' in ticket:
-                return jsonify({"ai_response": ticket['ai_response']})
-            
-            # Otherwise, generate a new response
-            ai_response = get_ai_response(ticket['description'])
-            if ai_response:
-                ticket['ai_response'] = ai_response
-                ticket['status'] = STATUS_AI_RESPONDED
-                ticket['history'].append({
-                    'timestamp': datetime.now().isoformat(),
-                    'action': 'AI response provided',
-                    'user': 'AI System'
-                })
-                save_tickets()
+    try:
+        for ticket in tickets:
+            if ticket['id'] == ticket_id:
+                # If ticket already has an AI response, return it
+                if 'ai_response' in ticket:
+                    return api_response(data={"ai_response": ticket['ai_response']}, message="AI response retrieved successfully")
                 
-                # Send email notification about AI response
-                try:
-                    notify_ai_response(ticket)
-                except Exception as e:
-                    logger.error(f"Error sending AI response notification: {e}")
-                
-                return jsonify({"ai_response": ai_response})
-            else:
-                return jsonify({"error": "Failed to generate AI response"}), 500
-    
-    return jsonify({"error": "Ticket not found"}), 404
+                # Otherwise, generate a new response
+                ai_response = get_ai_response(ticket['description'])
+                if ai_response:
+                    ticket['ai_response'] = ai_response
+                    ticket['status'] = STATUS_AI_RESPONDED
+                    
+                    # Add history entry if ticket has history field
+                    if 'history' in ticket:
+                        ticket['history'].append({
+                            'timestamp': datetime.now().isoformat(),
+                            'action': 'AI response provided',
+                            'user': 'AI System'
+                        })
+                    else:
+                        # Create history field if it doesn't exist
+                        ticket['history'] = [{
+                            'timestamp': datetime.now().isoformat(),
+                            'action': 'AI response provided',
+                            'user': 'AI System'
+                        }]
+                    
+                    save_tickets()
+                    
+                    # Send email notification about AI response
+                    try:
+                        notify_ai_response(ticket)
+                    except Exception as e:
+                        logger.error(f"Error sending AI response notification: {e}")
+                    
+                    return api_response(data={"ai_response": ai_response}, message="AI response generated successfully")
+                else:
+                    return api_response(data=None, message="Failed to generate AI response", success=False, status_code=500)
+        
+        return api_response(data=None, message="Ticket not found", success=False, status_code=404)
+    except Exception as e:
+        logger.error(f"Error getting AI response for ticket {ticket_id}: {e}")
+        return api_response(data=None, message=f"Error getting AI response: {str(e)}", success=False, status_code=500)
 
 @app.route('/api/stats', methods=['GET'])
 def get_stats():
     """Get ticket statistics for admin dashboard"""
-    total = len(tickets)
-    new = len([t for t in tickets if t['status'] == STATUS_NEW])
-    ai_responded = len([t for t in tickets if t['status'] == STATUS_AI_RESPONDED])
-    assigned = len([t for t in tickets if t['status'] == STATUS_ASSIGNED])
-    resolved = len([t for t in tickets if t['status'] == STATUS_RESOLVED])
-    
-    # Calculate AI resolution rate
-    ai_resolution_rate = 0
-    if total > 0:
-        ai_resolution_rate = (ai_responded / total) * 100
-    
-    return jsonify({
-        'total_tickets': total,
-        'new_tickets': new,
-        'ai_responded_tickets': ai_responded,
-        'assigned_tickets': assigned,
-        'resolved_tickets': resolved,
-        'ai_resolution_rate': ai_resolution_rate
-    })
+    try:
+        total = len(tickets)
+        new = len([t for t in tickets if t['status'] == STATUS_NEW])
+        ai_responded = len([t for t in tickets if t['status'] == STATUS_AI_RESPONDED])
+        assigned = len([t for t in tickets if t['status'] == STATUS_ASSIGNED])
+        resolved = len([t for t in tickets if t['status'] == STATUS_RESOLVED])
+        
+        # Calculate AI resolution rate
+        ai_resolution_rate = 0
+        if total > 0:
+            ai_resolution_rate = (ai_responded / total) * 100
+        
+        stats_data = {
+            'total_tickets': total,
+            'new_tickets': new,
+            'ai_responded_tickets': ai_responded,
+            'assigned_tickets': assigned,
+            'resolved_tickets': resolved,
+            'ai_resolution_rate': ai_resolution_rate
+        }
+        
+        return api_response(data=stats_data, message="Statistics retrieved successfully")
+    except Exception as e:
+        logger.error(f"Error retrieving statistics: {e}")
+        return api_response(data=None, message=f"Error retrieving statistics: {str(e)}", success=False, status_code=500)
 
 # Load existing tickets on startup
 load_tickets()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
+    
+    # Check if ngrok should be used for public access
+    use_ngrok = os.environ.get('USE_NGROK', 'False').lower() == 'true'
+    
+    if use_ngrok:
+        # Import and initialize ngrok
+        from pyngrok import ngrok
+        
+        # Open a ngrok tunnel to the HTTP server
+        public_url = ngrok.connect(port)
+        print(f" * ngrok tunnel \'{public_url}\' -> 'http://127.0.0.1:{port}'")
+        print(f" * Use this URL in PowerApps: {public_url}/api")
+        
+        # Update any base URLs to use the ngrok URL
+        app.config['BASE_URL'] = public_url
+    
     app.run(host='0.0.0.0', port=port, debug=False)
