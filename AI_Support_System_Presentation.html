@@ -47,11 +47,24 @@
             border: 1px solid #ddd;
             height: 300px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             margin: 20px 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .diagram-title {
             font-size: 24px;
-            color: #777;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .diagram-description {
+            font-size: 18px;
+            color: #7f8c8d;
+            max-width: 80%;
+            line-height: 1.4;
         }
         table {
             width: 100%;
@@ -83,13 +96,6 @@
             overflow-x: auto;
             font-family: 'Courier New', Courier, monospace;
         }
-        .notes {
-            background-color: #f9f9f9;
-            border-left: 4px solid #3498db;
-            padding: 10px 20px;
-            margin: 20px 0;
-            font-style: italic;
-        }
         .subtitle {
             text-align: center;
             font-size: 24px;
@@ -108,16 +114,13 @@
     <div class="slide" id="title">
         <h1>AI-Powered Customer Support System</h1>
         <div class="subtitle">PowerApps Integration & Backend API</div>
+        <p style="text-align: center;">By Onur Oksuz</p>
         <p style="text-align: center;">June 16, 2025</p>
-        <div class="image-placeholder">Title Slide</div>
-        <div class="notes">
-            <strong>Speaker Notes:</strong> "Welcome everyone. Today I'm presenting our AI-Powered Customer Support System, which combines a Flask backend API with a PowerApps frontend. This system modernizes customer support by automating initial responses with AI while maintaining the human touch for complex issues."
-        </div>
     </div>
 
     <div class="slide" id="overview">
         <h2>1. Project Overview</h2>
-        <div class="image-placeholder">System Overview Diagram</div>
+
         <ul>
             <li><strong>System Purpose</strong>: AI-enhanced customer support ticket management</li>
             <li><strong>Architecture</strong>: Flask backend API + PowerApps frontend</li>
@@ -131,29 +134,38 @@
                 </ul>
             </li>
         </ul>
-        <div class="notes">
-            <strong>Speaker Notes:</strong> "Our system serves three user types: customers who submit tickets, agents who resolve them, and administrators who oversee the entire process. The integration between our Flask API and PowerApps creates a seamless experience across these roles."
-        </div>
+
     </div>
 
     <div class="slide" id="technical">
         <h2>2. Technical Implementation</h2>
-        <div class="image-placeholder">Technical Architecture Diagram</div>
+        <div class="image-placeholder">
+            <div class="diagram-title">Technical Architecture Diagram</div>
+            <div class="diagram-description">PowerApps ↔ Flask API ↔ JSON Storage ↔ OpenAI API</div>
+        </div>
         <ul>
             <li><strong>Backend Technology</strong>: Python Flask API</li>
             <li><strong>Data Storage</strong>: JSON file persistence (easily upgradable to database)</li>
-            <li><strong>AI Integration</strong>: OpenAI API with fallback mechanism</li>
+            <li><strong>AI Component</strong>: OpenAI API integration</li>
             <li><strong>Frontend</strong>: Microsoft PowerApps</li>
             <li><strong>Hosting</strong>: Render.com cloud platform</li>
         </ul>
-        <div class="notes">
-            <strong>Speaker Notes:</strong> "Let's look at our technical architecture. The backend is built with Python Flask, providing a lightweight yet powerful API framework. For simplicity in this prototype, we're using JSON file persistence, though this can be easily upgraded to a database solution. The AI component leverages OpenAI's API with a fallback mechanism for reliability."
-        </div>
+        
+        <h3>Render.com Deployment</h3>
+        <img src="screenshots/render_dashboard.png" alt="Render.com Dashboard" style="max-width:100%; border:1px solid #ccc; margin-bottom:8px;">
+        <div style="text-align:center; color:#555; margin-bottom:24px;">Render.com Dashboard: Flask API Service with Uptime and Performance Metrics</div>
+        
+        <h3>Server Logs</h3>
+        <img src="screenshots/render_logs.png" alt="API Server Logs" style="max-width:100%; border:1px solid #ccc; margin-bottom:8px;">
+        <div style="text-align:center; color:#555; margin-bottom:24px;">API Server Logs: Request Processing and AI Integration in Action</div>
     </div>
 
     <div class="slide" id="api-design">
         <h2>3. API Design & Integration</h2>
-        <div class="image-placeholder">API Design Diagram</div>
+        <div class="image-placeholder">
+            <div class="diagram-title">API Design</div>
+            <div class="diagram-description">RESTful Endpoints with Standardized JSON Response Format</div>
+        </div>
         <ul>
             <li><strong>RESTful Endpoints</strong>: Standardized for PowerApps compatibility</li>
             <li><strong>Response Format</strong>:
@@ -166,14 +178,15 @@
             <li><strong>CORS Configuration</strong>: Enabled for cross-origin requests</li>
             <li><strong>Error Handling</strong>: Try-except blocks with logging</li>
         </ul>
-        <div class="notes">
-            <strong>Speaker Notes:</strong> "The API design was critical for PowerApps integration. We implemented RESTful endpoints following best practices, with a standardized JSON response format that includes success status, message, and data fields. CORS configuration was carefully implemented to allow cross-origin requests from PowerApps."
-        </div>
+
     </div>
 
     <div class="slide" id="endpoints">
         <h2>4. Key API Endpoints</h2>
-        <div class="image-placeholder">API Endpoints Diagram</div>
+        <div class="image-placeholder">
+            <div class="diagram-title">API Endpoints</div>
+            <div class="diagram-description">GET/POST/PUT Endpoints for Ticket Lifecycle Management</div>
+        </div>
         <table>
             <thead>
                 <tr>
@@ -220,90 +233,61 @@
                 </tr>
             </tbody>
         </table>
-        <div class="notes">
-            <strong>Speaker Notes:</strong> "Our API provides several key endpoints. Each endpoint follows the same response structure for consistency and ease of integration. The endpoints are designed to handle all aspects of ticket management from creation to resolution."
-        </div>
+
     </div>
 
     <div class="slide" id="powerapps">
         <h2>5. PowerApps Integration</h2>
-        <div class="image-placeholder">PowerApps Integration Diagram</div>
+        <img src="screenshots/powerapps_welcome.png" alt="PowerApps Welcome Screen" style="max-width:100%; border:1px solid #ccc; margin-bottom:8px;">
+        <div style="text-align:center; color:#555; margin-bottom:24px;">PowerApps Welcome Screen (Role Selection)</div>
+        <img src="screenshots/powerapps_customer_portal.png" alt="PowerApps Customer Portal" style="max-width:100%; border:1px solid #ccc; margin-bottom:8px;">
+        <div style="text-align:center; color:#555; margin-bottom:24px;">Customer Support Portal: Submit a Support Ticket</div>
+        <img src="screenshots/power_automate_flows.png" alt="Power Automate Flows" style="max-width:100%; border:1px solid #ccc; margin-bottom:8px;">
+        <div style="text-align:center; color:#555; margin-bottom:24px;">Power Automate Flows: API Integration for Ticket Management</div>
         <ul>
             <li><strong>Connection Method</strong>: HTTP connector to Render.com API</li>
             <li><strong>Authentication</strong>: Simple API key (expandable to OAuth)</li>
             <li><strong>Data Flow</strong>: PowerApps ↔ API ↔ Backend Processing</li>
             <li><strong>UI Components</strong>: Forms, galleries, and buttons mapped to API endpoints</li>
         </ul>
-        <div class="notes">
-            <strong>Speaker Notes:</strong> "PowerApps integration was achieved through HTTP connectors pointing to our Render.com hosted API. The authentication is currently handled with simple API keys, though this could be expanded to OAuth for enterprise deployment. The data flow is bidirectional - PowerApps sends user inputs to the API and displays the returned data."
-        </div>
-    </div>
 
-    <div class="slide" id="user-experience">
-        <h2>6. User Experience</h2>
-        <div class="image-placeholder">User Interface Screenshots</div>
-        <ul>
-            <li><strong>Customer Portal</strong>: Submit tickets and view responses</li>
-            <li><strong>Agent Dashboard</strong>: Manage assigned tickets and provide resolutions</li>
-            <li><strong>Admin Interface</strong>: Monitor system performance and statistics</li>
-        </ul>
-        <div class="notes">
-            <strong>Speaker Notes:</strong> "Let me walk you through the user experience for each role: Customers access a simple portal where they can submit new tickets and view responses to their existing ones. Agents have a dashboard showing tickets assigned to them, with tools to provide resolutions. Administrators get an overview of the entire system with statistics on ticket volume, resolution rates, and AI effectiveness."
-        </div>
     </div>
 
     <div class="slide" id="testing">
-        <h2>7. Testing & Validation</h2>
-        <div class="image-placeholder">Testing Process Diagram</div>
+        <h2>6. Testing & Validation</h2>
+
         <ul>
             <li><strong>API Testing</strong>: Comprehensive test script and Postman collection</li>
             <li><strong>Integration Testing</strong>: PowerApps connector validation</li>
-            <li><strong>Performance Testing</strong>: Response time and scalability assessment</li>
+            <li><strong>Performance Testing</strong>: Response time and load testing</li>
         </ul>
-        <div class="notes">
-            <strong>Speaker Notes:</strong> "We've thoroughly tested the system at multiple levels: Our API testing uses a comprehensive test script that verifies all endpoints and edge cases. Integration testing confirmed that the PowerApps connector correctly communicates with our API under various conditions. Performance testing showed that the system maintains good response times even under load."
-        </div>
-    </div>
-
-    <div class="slide" id="future">
-        <h2>8. Future Enhancements</h2>
-        <div class="image-placeholder">Future Roadmap Diagram</div>
-        <ul>
-            <li><strong>Database Migration</strong>: Move from JSON to SQL/NoSQL database</li>
-            <li><strong>Authentication System</strong>: Implement JWT or OAuth</li>
-            <li><strong>Advanced AI Features</strong>: Sentiment analysis and priority scoring</li>
-            <li><strong>Mobile App</strong>: Dedicated native mobile application</li>
-        </ul>
-        <div class="notes">
-            <strong>Speaker Notes:</strong> "While the current system meets our requirements, we've identified several enhancements for future iterations: Moving from JSON to a proper database would improve scalability and data integrity. Implementing JWT or OAuth would strengthen security. We could add advanced AI features like sentiment analysis to prioritize urgent tickets automatically."
-        </div>
-    </div>
-
-    <div class="slide" id="demo">
-        <h2>9. Demo</h2>
-        <div class="image-placeholder">Live Demo</div>
-        <ul>
-            <li>Ticket creation</li>
-            <li>AI response generation</li>
-            <li>Agent assignment and resolution</li>
-            <li>Admin statistics dashboard</li>
-        </ul>
-        <div class="notes">
-            <strong>Speaker Notes:</strong> "Now, let me demonstrate the system in action. I'll show you how a customer creates a new ticket, the automatic AI response generation, an agent assigning and resolving the ticket, and the admin dashboard with real-time statistics. As you can see, the workflow is intuitive and efficient, with the AI providing immediate initial responses while agents focus on more complex resolution."
-        </div>
-    </div>
-
-    <div class="slide" id="qa">
-        <h2>10. Q&A</h2>
-        <div class="image-placeholder">Questions & Answers</div>
-        <p style="text-align: center; font-size: 24px; margin-top: 40px;">Thank you for your attention!</p>
-        <p style="text-align: center;">Contact: your.email@example.com</p>
-        <div class="notes">
-            <strong>Speaker Notes:</strong> "That concludes my presentation. I'm now happy to answer any questions you might have about the system architecture, implementation details, or future development plans. Thank you for your attention!"
-        </div>
+        
+        <h3>Postman Collection</h3>
+        <img src="screenshots/postman_create_ticket.png" alt="Postman Collection Overview" style="max-width:100%; border:1px solid #ccc; margin-bottom:8px;">
+        <div style="text-align:center; color:#555; margin-bottom:24px;">Postman Collection: Organized API Endpoints with Environment Variables</div>
+        
+        <h3>API Request Examples</h3>
+        <img src="screenshots/postman_get_tickets.png" alt="GET /api/tickets" style="max-width:100%; border:1px solid #ccc; margin-bottom:8px;">
+        <div style="text-align:center; color:#555; margin-bottom:24px;">GET /api/tickets: Retrieving All Tickets with Filtering Options</div>
+        
+        <img src="screenshots/postman_create_ticket.png" alt="POST /api/tickets" style="max-width:100%; border:1px solid #ccc; margin-bottom:8px;">
+        <div style="text-align:center; color:#555; margin-bottom:24px;">POST /api/tickets: Creating a New Support Ticket with JSON Payload</div>
+        
+        <img src="screenshots/postman_get_specific_ticket.png" alt="GET /api/tickets/{id}" style="max-width:100%; border:1px solid #ccc; margin-bottom:8px;">
+        <div style="text-align:center; color:#555; margin-bottom:24px;">GET /api/tickets/{id}: Retrieve a Specific Ticket</div>
+        
+        <img src="screenshots/postman_ai_response.png" alt="GET /api/tickets/{id}/ai_response" style="max-width:100%; border:1px solid #ccc; margin-bottom:8px;">
+        <div style="text-align:center; color:#555; margin-bottom:24px;">GET /api/tickets/{id}/ai_response: AI-Generated Response for Customer Support</div>
+        
+        <img src="screenshots/postman_assign_ticket.png" alt="POST /api/tickets/{id}/assign" style="max-width:100%; border:1px solid #ccc; margin-bottom:8px;">
+        <div style="text-align:center; color:#555; margin-bottom:24px;">POST /api/tickets/{id}/assign: Assign Ticket to Agent</div>
+        
+        <img src="screenshots/postman_stats.png" alt="GET /api/stats" style="max-width:100%; border:1px solid #ccc; margin-bottom:8px;">
+        <div style="text-align:center; color:#555; margin-bottom:24px;">GET /api/stats: System Statistics Overview</div>
     </div>
 
     <div class="footer">
+        <p style="text-align: center;">Contact: onur.vizja@gmail.com</p>
         AI-Powered Customer Support System | PowerApps Integration & Backend API | June 2025
     </div>
 </body>

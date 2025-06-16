@@ -1,7 +1,7 @@
 ---
 title: AI-Powered Customer Support System
 subtitle: PowerApps Integration & Backend API
-author: Your Name
+author: Onur Oksuz
 date: June 16, 2025
 ---
 

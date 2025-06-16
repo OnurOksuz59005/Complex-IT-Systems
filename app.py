@@ -8,10 +8,8 @@ import uuid
 import logging
 
 app = Flask(__name__)
-# Enable CORS with specific settings for PowerApps integration
 CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE"], "allow_headers": "*"}})
 
-# Add response headers for PowerApps compatibility
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
@@ -19,7 +17,6 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
     return response
 
-# Helper function to create standardized API responses for PowerApps
 def api_response(data=None, message="Success", success=True, status_code=200):
     """Create a standardized API response format for PowerApps"""
     response = {
@@ -29,7 +26,6 @@ def api_response(data=None, message="Success", success=True, status_code=200):
     }
     return jsonify(response), status_code
 
-# Configure Flask-Mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -37,10 +33,8 @@ app.config['MAIL_USERNAME'] = 'onur.vizja@gmail.com'
 app.config['MAIL_PASSWORD'] = 'ytrk favy lskp vmao'
 app.config['MAIL_DEFAULT_SENDER'] = 'onur.vizja@gmail.com'
 
-# Initialize Flask-Mail
 mail = Mail(app)
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -128,29 +122,23 @@ def index():
     </html>
     '''
 
-# In-memory database for demonstration purposes
-# In a real application, you would use a proper database
 tickets = []
 
-# Sample ticket statuses
 STATUS_NEW = "new"
 STATUS_AI_RESPONDED = "ai_responded"
 STATUS_ASSIGNED = "assigned"
 STATUS_RESOLVED = "resolved"
 
-# Sample user roles
 ROLE_CUSTOMER = "customer"
 ROLE_AGENT = "agent"
 ROLE_ADMIN = "admin"
 
-# Sample mock users (in a real app, this would be in a database with proper authentication)
 users = {
     "customer@example.com": {"role": ROLE_CUSTOMER, "name": "John Customer"},
     "onur.vizja@gmail.com": {"role": ROLE_AGENT, "name": "Onur Oksuz"},
     "onur.vizja@gmail.com": {"role": ROLE_ADMIN, "name": "Admin User"}
 }
 
-# Load tickets from file if it exists (for persistence between server restarts)
 def load_tickets():
     global tickets
     try:
@@ -160,7 +148,6 @@ def load_tickets():
     except Exception as e:
         logger.error(f"Error loading tickets: {e}")
 
-# Save tickets to file
 def save_tickets():
     try:
         with open('tickets.json', 'w') as f:
@@ -168,7 +155,6 @@ def save_tickets():
     except Exception as e:
         logger.error(f"Error saving tickets: {e}")
         
-# Send email notification
 def send_email_notification(recipient, subject, body, html_body):
     """Send email notification to the specified recipient"""
     try:
@@ -185,12 +171,9 @@ def send_email_notification(recipient, subject, body, html_body):
         logger.error(f"Failed to send email: {e}")
         return False
         
-# Notify customer about ticket creation
 def notify_ticket_created(ticket):
     """Send notification to customer when ticket is created"""
     subject = f"Ticket Created: {ticket['title']}"
-    
-    # Plain text version
     body = f"""Dear Customer,
 
 Thank you for contacting our support team. Your ticket has been created successfully.
@@ -203,8 +186,6 @@ We will get back to you as soon as possible.
 
 Best regards,
 Support Team"""
-    
-    # HTML version
     html_body = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
         <h2 style="color: #2196F3;">Support Ticket Created</h2>
@@ -225,12 +206,9 @@ Support Team"""
     
     return send_email_notification(ticket['customer_email'], subject, body, html_body)
     
-# Notify customer about AI response
 def notify_ai_response(ticket):
     """Send notification to customer when AI responds to their ticket"""
     subject = f"AI Response to Your Ticket: {ticket['title']}"
-    
-    # Plain text version
     body = f"""Dear Customer,
 
 Our AI assistant has provided a response to your ticket.
@@ -243,8 +221,6 @@ If this resolves your issue, no further action is needed. If you need additional
 
 Best regards,
 Support Team"""
-    
-    # HTML version
     html_body = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
         <h2 style="color: #2196F3;">AI Response to Your Support Ticket</h2>
@@ -267,12 +243,9 @@ Support Team"""
     
     return send_email_notification(ticket['customer_email'], subject, body, html_body)
     
-# Notify customer about ticket resolution
 def notify_ticket_resolved(ticket):
     """Send notification to customer when their ticket is resolved"""
     subject = f"Ticket Resolved: {ticket['title']}"
-    
-    # Plain text version
     body = f"""Dear Customer,
 
 Your support ticket has been resolved.
@@ -285,8 +258,6 @@ If you have any further questions, please don't hesitate to contact us.
 
 Best regards,
 Support Team"""
-    
-    # HTML version
     html_body = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
         <h2 style="color: #4CAF50;">Support Ticket Resolved</h2>
@@ -308,13 +279,10 @@ Support Team"""
     """
     
     return send_email_notification(ticket['customer_email'], subject, body, html_body)
-    
-# Notify agent about ticket assignment
+
 def notify_agent_assignment(ticket):
     """Send notification to agent when a ticket is assigned to them"""
     subject = f"Ticket Assigned: {ticket['title']}"
-    
-    # Plain text version
     body = f"""Hello,
 
 A new ticket has been assigned to you.
@@ -328,8 +296,6 @@ Please review and respond to this ticket at your earliest convenience.
 
 Best regards,
 Support System"""
-    
-    # HTML version
     html_body = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
         <h2 style="color: #FF9800;">New Ticket Assigned</h2>
@@ -353,17 +319,13 @@ Support System"""
     
     return send_email_notification(ticket['assigned_to'], subject, body, html_body)
 
-# Mock AI response function (in a real app, this would call the ChatGPT API)
 def get_ai_response(question):
     """Get response from OpenAI's ChatGPT API using direct HTTP request"""
     try:
         import requests
         import json
         
-        # Get OpenAI API key from environment variable
         openai_api_key = os.environ.get("OPENAI_API_KEY")
-        
-        # Debug logging
         if openai_api_key:
             logger.info(f"OpenAI API key found. Length: {len(openai_api_key)}, First 5 chars: {openai_api_key[:5]}")
         else:
@@ -739,25 +701,16 @@ def get_stats():
         logger.error(f"Error retrieving statistics: {e}")
         return api_response(data=None, message=f"Error retrieving statistics: {str(e)}", success=False, status_code=500)
 
-# Load existing tickets on startup
 load_tickets()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     
-    # Check if ngrok should be used for public access
     use_ngrok = os.environ.get('USE_NGROK', 'False').lower() == 'true'
-    
     if use_ngrok:
-        # Import and initialize ngrok
         from pyngrok import ngrok
-        
-        # Open a ngrok tunnel to the HTTP server
         public_url = ngrok.connect(port)
-        print(f" * ngrok tunnel \'{public_url}\' -> 'http://127.0.0.1:{port}'")
+        print(f" * ngrok tunnel '{public_url}' -> 'http://127.0.0.1:{port}'")
         print(f" * Use this URL in PowerApps: {public_url}/api")
-        
-        # Update any base URLs to use the ngrok URL
         app.config['BASE_URL'] = public_url
-    
     app.run(host='0.0.0.0', port=port, debug=False)
